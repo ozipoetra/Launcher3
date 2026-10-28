@@ -1,57 +1,27 @@
-buildscript {
-    repositories {
-        mavenCentral()
-        jcenter()
-        google()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.6'
-    }
+plugins {
+    id 'com.android.library'
+    id 'com.google.protobuf'
 }
 
-apply plugin: 'com.android.library'
-apply plugin: 'com.google.protobuf'
-
 android {
-    compileSdkVersion 27
-    buildToolsVersion '28.0.3'
+    namespace = 'com.android.launcher3'
+    compileSdk = 37
 
     defaultConfig {
-        targetSdkVersion 27
-        versionCode 30907
-        versionName "3.9"
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         debug {
-            minifyEnabled false
+            minifyEnabled = false
         }
-
-//        optimized {
-//            initWith debug
-//            minifyEnabled true
-//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
-//                    'proguard.flags'
-//        }
     }
 
-    flavorDimensions 'lib'
+    flavorDimensions += ['lib']
 
     productFlavors {
         aosp {
-            dimension 'lib'
-//            applicationId 'com.google.android.apps.nexuslauncher'
-//            testApplicationId 'com.android.launcher3.tests'
+            dimension = 'lib'
         }
-
-//        l3go {
-//            dimension 'lib'
-//            applicationId 'com.android.launcher3'
-//            testApplicationId 'com.android.launcher3.tests'
-//        }
     }
     sourceSets {
         main {
@@ -77,36 +47,14 @@ android {
             java.srcDirs = ['src_flags']
             manifest.srcFile "AndroidManifest.xml"
         }
-
-//        aospAndroidTest {
-//            manifest.srcFile "tests/AndroidManifest.xml"
-//        }
-
-//        l3go {
-//            res.srcDirs = ['go/res']
-//            java.srcDirs = ['go/src_flags']
-//            // Note: we are using the Launcher3 manifest here because the gradle manifest-merger uses
-//            // different attributes than the build system.
-//            manifest.srcFile "AndroidManifest.xml"
-//        }
-
-//        l3goAndroidTest {
-//            manifest.srcFile "tests/AndroidManifest.xml"
-//        }
     }
-    lintOptions {
-        abortOnError false
+    lint {
+        abortOnError = false
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
-}
-
-repositories {
-    mavenCentral()
-    jcenter()
-    google()
 }
 
 final String SUPPORT_LIBS_VERSION = '27.1.1'
@@ -128,7 +76,9 @@ dependencies {
 }
 
 protobuf {
-    // Configure the protoc executable
+    // Configure the protoc executable. Pinned to the same protoc
+    // the javanano runtime below expects; modern protoc versions
+    // dropped the javanano generator.
     protoc {
         artifact = 'com.google.protobuf:protoc:3.0.0-alpha-3'
 

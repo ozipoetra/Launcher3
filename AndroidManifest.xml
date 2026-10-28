@@ -19,8 +19,7 @@
 -->
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.android.launcher3" >
+    xmlns:tools="http://schemas.android.com/tools" >
     <!--
     Manifest entries specific to Launcher3. This is merged with AndroidManifest-common.xml.
     Refer comments around specific entries on how to extend individual components.
@@ -76,7 +75,7 @@
         Main launcher activity. When extending only change the name, and keep all the
         attributes and intent filters the same
         -->
-        <activity
+        <activity android:exported="true"
             android:name="com.google.android.apps.nexuslauncher.NexusLauncherActivity"
             android:launchMode="singleTask"
             android:clearTaskOnLaunch="true"
@@ -100,7 +99,7 @@
         <!--
         The settings activity. When extending keep the intent filter present
         -->
-        <activity
+        <activity android:exported="true"
             android:name="com.google.android.apps.nexuslauncher.SettingsActivity"
             android:label="@string/launcher_settings_text"
             android:theme="@android:style/Theme.Material.Light"
@@ -127,7 +126,7 @@
         <!--
         Pixel
         -->
-        <activity
+        <activity android:exported="true"
             android:name="com.google.android.apps.nexuslauncher.search.AppLaunchActivity"
             android:theme="@android:style/Theme.NoDisplay">
             <intent-filter android:priority="1">
@@ -138,12 +137,12 @@
                     android:scheme="content"/>
             </intent-filter>
         </activity>
-        <receiver android:name="com.google.android.apps.nexuslauncher.qsb.OPAStatusReceiver" android:permission="android.permission.CAPTURE_AUDIO_HOTWORD">
+        <receiver android:exported="true" android:name="com.google.android.apps.nexuslauncher.qsb.OPAStatusReceiver" android:permission="android.permission.CAPTURE_AUDIO_HOTWORD">
             <intent-filter>
                 <action android:name="com.google.android.systemui.OPA_ENABLED" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.google.android.apps.nexuslauncher.smartspace.SmartspaceBroadcastReceiver">
+        <receiver android:exported="true" android:name="com.google.android.apps.nexuslauncher.smartspace.SmartspaceBroadcastReceiver">
             <intent-filter>
                 <action android:name="com.google.android.apps.nexuslauncher.UPDATE_SMARTSPACE" />
             </intent-filter>
@@ -161,7 +160,7 @@
 
         <!-- ENABLE_FOR_TESTING
 
-        <activity
+        <activity android:exported="true"
             android:name="com.android.launcher3.testing.LauncherExtension"
             android:launchMode="singleTask"
             android:clearTaskOnLaunch="true"
@@ -178,7 +177,7 @@
             </intent-filter>
         </activity>
 
-        <activity
+        <activity android:exported="true"
             android:name="com.android.launcher3.testing.MemoryDumpActivity"
             android:theme="@android:style/Theme.NoDisplay"
             android:label="* HPROF"
@@ -192,7 +191,7 @@
             </intent-filter>
         </activity>
 
-        <activity
+        <activity android:exported="true"
             android:name="com.android.launcher3.testing.ToggleWeightWatcher"
             android:label="Show Mem"
             android:icon="@drawable/ic_launcher_home">
