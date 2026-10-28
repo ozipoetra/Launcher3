@@ -9,7 +9,6 @@ import android.content.pm.LauncherActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Rect;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Process;
@@ -333,55 +332,45 @@ public class LauncherAppsCompatForVA extends LauncherAppsCompatVL {
     }
 
     private static LauncherActivityInfo makeLauncherActivityInfo(Context context, ResolveInfo resolveInfo, UserHandle userHandle) {
+        // Host support is Android 12+ (minSdk 31), so only two
+        // constructor shapes can occur: Android 16's and the
+        // Android 12-15 one. The pre-12 branches (direct
+        // ActivityInfo / ResolveInfo constructors) are gone.
         try {
-            if (Build.VERSION.SDK_INT > 30 || (Build.VERSION.SDK_INT == 30 && Build.VERSION.PREVIEW_SDK_INT != 0)) {
-                Class<?> infoInternalClass = Class.forName("android.content.pm.LauncherActivityInfoInternal");
-                Class<?> IncrementalStatesInfo_Class = Class.forName("android.content.pm.IncrementalStatesInfo");
+            Class<?> infoInternalClass = Class.forName("android.content.pm.LauncherActivityInfoInternal");
+            Class<?> IncrementalStatesInfo_Class = Class.forName("android.content.pm.IncrementalStatesInfo");
 
-                try {
-                    // Android 16 shape: the user moved into the
-                    // internal object (4-arg constructor with
-                    // UserHandle + supportsMultiInstance), and
-                    // LauncherActivityInfo lost its UserHandle
-                    // parameter. The Android 12-15 constructors
-                    // this method used before no longer exist
-                    // there — NoSuchMethodException made every
-                    // installed app silently vanish from the
-                    // home screen (the failure is swallowed per
-                    // item by the caller). Verified against AOSP
-                    // android-16.0.0_r1.
-                    Constructor<?> internalCons16 = infoInternalClass.getConstructor(
-                            ActivityInfo.class, IncrementalStatesInfo_Class, UserHandle.class, boolean.class);
-                    Object internal16 = internalCons16.newInstance(
-                            resolveInfo.activityInfo, null, userHandle, false);
-                    Constructor<LauncherActivityInfo> constructor16 = LauncherActivityInfo.class
-                            .getDeclaredConstructor(Context.class, infoInternalClass);
-                    constructor16.setAccessible(true);
-                    return constructor16.newInstance(context, internal16);
-                } catch (NoSuchMethodException e) {
-                    // Not the Android 16 shape — fall through to
-                    // the Android 12-15 constructors below.
-                }
-
-                Constructor<?> LauncherActivityInfoInternal_cons = infoInternalClass.getConstructor(ActivityInfo.class, IncrementalStatesInfo_Class);
-                Constructor<LauncherActivityInfo> constructor = LauncherActivityInfo.class.getDeclaredConstructor(Context.class, UserHandle.class, infoInternalClass);
-                constructor.setAccessible(true);
-
-                Object launcherActivityInfoInternal = LauncherActivityInfoInternal_cons.newInstance(resolveInfo.activityInfo, null);
-                return constructor.newInstance(context, userHandle, launcherActivityInfoInternal);
+            try {
+                // Android 16 shape: the user moved into the
+                // internal object (4-arg constructor with
+                // UserHandle + supportsMultiInstance), and
+                // LauncherActivityInfo lost its UserHandle
+                // parameter. The Android 12-15 constructors
+                // below no longer exist there —
+                // NoSuchMethodException made every installed
+                // app silently vanish from the home screen
+                // (the failure is swallowed per item by the
+                // caller). Verified against AOSP
+                // android-16.0.0_r1.
+                Constructor<?> internalCons16 = infoInternalClass.getConstructor(
+                        ActivityInfo.class, IncrementalStatesInfo_Class, UserHandle.class, boolean.class);
+                Object internal16 = internalCons16.newInstance(
+                        resolveInfo.activityInfo, null, userHandle, false);
+                Constructor<LauncherActivityInfo> constructor16 = LauncherActivityInfo.class
+                        .getDeclaredConstructor(Context.class, infoInternalClass);
+                constructor16.setAccessible(true);
+                return constructor16.newInstance(context, internal16);
+            } catch (NoSuchMethodException e) {
+                // Not the Android 16 shape — fall through to
+                // the Android 12-15 constructors below.
             }
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                Constructor<LauncherActivityInfo> constructor = LauncherActivityInfo.class.getDeclaredConstructor(Context.class, ActivityInfo.class, UserHandle.class);
-                constructor.setAccessible(true);
-                return constructor.newInstance(context, resolveInfo.activityInfo, userHandle);
-            } else if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Constructor<LauncherActivityInfo> constructor = LauncherActivityInfo.class.getDeclaredConstructor(Context.class,
-                        ResolveInfo.class, UserHandle.class, long.class);
-                constructor.setAccessible(true);
-                return constructor.newInstance(context, resolveInfo, userHandle, System.currentTimeMillis());
-            } else {
-                throw new RuntimeException("can not construct launcher activity info");
-            }
+
+            Constructor<?> LauncherActivityInfoInternal_cons = infoInternalClass.getConstructor(ActivityInfo.class, IncrementalStatesInfo_Class);
+            Constructor<LauncherActivityInfo> constructor = LauncherActivityInfo.class.getDeclaredConstructor(Context.class, UserHandle.class, infoInternalClass);
+            constructor.setAccessible(true);
+
+            Object launcherActivityInfoInternal = LauncherActivityInfoInternal_cons.newInstance(resolveInfo.activityInfo, null);
+            return constructor.newInstance(context, userHandle, launcherActivityInfoInternal);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
