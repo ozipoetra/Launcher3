@@ -55,6 +55,9 @@ android {
         // ILauncherOverlay + the aidlbridge interfaces live
         // under src/; AGP 8+ compiles AIDL only when asked.
         aidl = true
+        // CustomAppFilter references the generated BuildConfig;
+        // AGP 8+ generates it only when asked.
+        buildConfig = true
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

@@ -26,7 +26,10 @@ public class CustomAppFilter extends NexusAppFilter {
 
     @Override
     public boolean shouldShowApp(ComponentName componentName, UserHandle user) {
-        if (componentName.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
+        // AGP 3's library BuildConfig called this APPLICATION_ID;
+        // the modern field for a library's own package is
+        // LIBRARY_PACKAGE_NAME (same value: com.android.launcher3).
+        if (componentName.getPackageName().equals(BuildConfig.LIBRARY_PACKAGE_NAME)) {
             return false;
         }
         if (CustomIconUtils.usingValidPack(mContext)) {
