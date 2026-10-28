@@ -28,12 +28,17 @@
     at compile time. Note that the components defined in AndroidManifest.xml are also required,
     with some minor changed based on the derivative app.
     -->
-    <permission
-        android:name="com.android.launcher.permission.INSTALL_SHORTCUT"
-        android:permissionGroup="android.permission-group.SYSTEM_TOOLS"
-        android:protectionLevel="dangerous"
-        android:label="@string/permlab_install_shortcut"
-        android:description="@string/permdesc_install_shortcut" />
+    <!-- Deliberately NOT declaring
+         com.android.launcher.permission.INSTALL_SHORTCUT here.
+         A standalone launcher owns that permission, but this
+         copy is a library inside another app: on devices whose
+         system launcher already owns the name (e.g. HyperOS's
+         com.mi.android.globallauncher), Android refuses to
+         install any app that re-declares it under a different
+         certificate (INSTALL_FAILED_DUPLICATE_PERMISSION,
+         error -127). The receiver below still references the
+         permission, which then resolves to the system
+         launcher's definition. -->
 
     <uses-feature android:name="android.hardware.telephony" android:required="false" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
