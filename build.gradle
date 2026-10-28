@@ -51,6 +51,11 @@ android {
     lint {
         abortOnError = false
     }
+    buildFeatures {
+        // ILauncherOverlay + the aidlbridge interfaces live
+        // under src/; AGP 8+ compiles AIDL only when asked.
+        aidl = true
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
