@@ -338,6 +338,31 @@ public class LauncherAppsCompatForVA extends LauncherAppsCompatVL {
                 Class<?> infoInternalClass = Class.forName("android.content.pm.LauncherActivityInfoInternal");
                 Class<?> IncrementalStatesInfo_Class = Class.forName("android.content.pm.IncrementalStatesInfo");
 
+                try {
+                    // Android 16 shape: the user moved into the
+                    // internal object (4-arg constructor with
+                    // UserHandle + supportsMultiInstance), and
+                    // LauncherActivityInfo lost its UserHandle
+                    // parameter. The Android 12-15 constructors
+                    // this method used before no longer exist
+                    // there — NoSuchMethodException made every
+                    // installed app silently vanish from the
+                    // home screen (the failure is swallowed per
+                    // item by the caller). Verified against AOSP
+                    // android-16.0.0_r1.
+                    Constructor<?> internalCons16 = infoInternalClass.getConstructor(
+                            ActivityInfo.class, IncrementalStatesInfo_Class, UserHandle.class, boolean.class);
+                    Object internal16 = internalCons16.newInstance(
+                            resolveInfo.activityInfo, null, userHandle, false);
+                    Constructor<LauncherActivityInfo> constructor16 = LauncherActivityInfo.class
+                            .getDeclaredConstructor(Context.class, infoInternalClass);
+                    constructor16.setAccessible(true);
+                    return constructor16.newInstance(context, internal16);
+                } catch (NoSuchMethodException e) {
+                    // Not the Android 16 shape — fall through to
+                    // the Android 12-15 constructors below.
+                }
+
                 Constructor<?> LauncherActivityInfoInternal_cons = infoInternalClass.getConstructor(ActivityInfo.class, IncrementalStatesInfo_Class);
                 Constructor<LauncherActivityInfo> constructor = LauncherActivityInfo.class.getDeclaredConstructor(Context.class, UserHandle.class, infoInternalClass);
                 constructor.setAccessible(true);
